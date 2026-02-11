@@ -347,7 +347,33 @@ void GridMap::cloudCallback(const sensor_msgs::PointCloud2ConstPtr &img)
   }
 
   pcl::PointCloud<pcl::PointXYZ> latest_cloud;
-  pcl::fromROSMsg(*img, latest_cloud);
+
+  if (img->header.frame_id != mp_.frame_id_)
+  { 
+    if (!md_.have_map_transform_)
+    {
+      try
+      {
+        tf::TransformListener listener;
+        listener.waitForTransform(mp_.frame_id_,img->header.frame_id,ros::Time(0), ros::Duration(5.0));
+        listener.lookupTransform(mp_.frame_id_,img->header.frame_id,ros::Time(0),md_.map_transform_);
+        md_.have_map_transform_ = true;
+      }
+      catch (tf::TransformException ex)
+      {
+        ROS_ERROR("%s",ex.what());
+        ros::Duration(1.0).sleep();
+      }
+    }
+    sensor_msgs::PointCloud2 rotated_cloud;
+    pcl_ros::transformPointCloud(mp_.frame_id_, md_.map_transform_, *img, rotated_cloud);
+    pcl::fromROSMsg(rotated_cloud, latest_cloud);
+  }
+  else
+  {
+    pcl::fromROSMsg(*img, latest_cloud);
+  }
+
 
   if (latest_cloud.points.size() == 0)
     return;

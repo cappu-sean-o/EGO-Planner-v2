@@ -12,10 +12,12 @@
 #include <ros/ros.h>
 #include <tuple>
 #include <visualization_msgs/Marker.h>
+#include <tf/transform_listener.h>
 
 #include <pcl/point_cloud.h>
 #include <pcl/point_types.h>
 #include <pcl_conversions/pcl_conversions.h>
+#include <pcl_ros/transforms.h>
 
 #include <message_filters/subscriber.h>
 #include <message_filters/sync_policies/approximate_time.h>
@@ -131,6 +133,11 @@ struct MappingData
 
   vector<Eigen::Vector3i> cache_voxel_;
   int cache_voxel_cnt_;
+
+  // pointcloud transform data
+
+  tf::StampedTransform map_transform_;
+  bool have_map_transform_ = false;
 
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 };
