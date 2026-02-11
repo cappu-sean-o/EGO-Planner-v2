@@ -35,6 +35,8 @@ namespace ego_planner
     ros::Publisher intermediate_grad_feas_pub;
     ros::Publisher intermediate_grad_swarm_pub;
 
+    std::string map_frame_id;
+
   public:
     PlanningVisualization(/* args */) {}
     ~PlanningVisualization() {}
